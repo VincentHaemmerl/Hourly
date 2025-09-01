@@ -1,16 +1,35 @@
-# hourly
+# Hourly 📱⏱️
 
-A new Flutter project.
+Eine Flutter-App für produktives Zeitmanagement mit Session-Tracking und Produktivitätsmessung.
 
-## Getting Started
+## Features ✨
 
-This project is a starting point for a Flutter application.
+- **Session-Timer**: Starte und stoppe Sessions mit benutzerdefinierten Namen
+- **Kategorien**: Organisiere Sessions in verschiedene Kategorien (Arbeit, Lernen, Sport, etc.)
+- **Persistente Speicherung**: Alle Sessions werden dauerhaft gespeichert
+- **Produktivitäts-Tracking**: Überwache deine Produktivität basierend auf den letzten Sessions
+- **Dynamische Farbkodierung**: Visuelles Feedback über dein Produktivitätslevel
+- **Notification-System**: Badge-Benachrichtigungen für neue Sessions
+- **Session-Historie**: Vollständige Übersicht aller gespeicherten Sessions
 
-A few resources to get you started if this is your first Flutter project:
+## Technologien 🛠️
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter** - Cross-platform mobile development
+- **Dart** - Programming language
+- **stop_watch_timer** - Präzise Timer-Funktionalität
+- **shared_preferences** - Lokale Datenspeicherung
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation 🚀
+
+1. Flutter SDK installieren
+2. Repository klonen: `git clone https://github.com/X0Vincent0X/Hourly.git`
+3. Dependencies installieren: `flutter pub get`
+4. App starten: `flutter run`
+
+## Produktivitätslevel 🎯
+
+- 🟢 **GROSSARTIG!** - Session heute
+- 🟢 **Hoch** - 1-4 Tage seit letzter Session
+- 🟠 **Mittelmäßig** - 5-9 Tage seit letzter Session
+- 🔴 **Niedrig** - 10-14 Tage seit letzter Session
+- 🔴 **ZU NIEDRIG!** - 15+ Tage seit letzter Session
