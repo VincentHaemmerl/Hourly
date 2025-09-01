@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Für SystemChrome
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -13,6 +14,8 @@ class Hourly extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Hourly',
+      debugShowCheckedModeBanner:
+          false, // Debug-Banner entfernen
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepPurple,
@@ -70,13 +73,13 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
   String getLastSessionText() {
     int days = getDaysSinceLastSession();
 
-    if (days == -1 || days >= 15) {
+    if (days == -1 || days >= 5) {
       return " ZU NIEDRIG!";
-    } else if (days >= 10 && days < 15) {
+    } else if (days >= 3 && days < 5) {
       return " niedrig";
-    } else if (days >= 5 && days < 10) {
+    } else if (days >= 1 && days < 3) {
       return " mittelmäßig";
-    } else if (days > 0 && days < 5) {
+    } else if (days > 0 && days < 1) {
       return " hoch";
     } else if (days == 0) {
       return " GROSSARTIG!";
@@ -89,6 +92,20 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
   void initState() {
     super.initState();
     _loadSessions(); // Sessions beim Start laden
+
+    // Verstecke die Navigationsleiste für diese spezifische Seite
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+    );
+
+    // Setze die Navigationsleiste auf transparent
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        statusBarColor: Colors.transparent,
+      ),
+    );
   }
 
   // Sessions aus SharedPreferences laden
@@ -359,15 +376,6 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
     print('Session gelöscht');
   }
 
-  // Alle Sessions löschen
-  Future<void> _clearAllSessions() async {
-    setState(() {
-      savedSessions.clear();
-    });
-    await _saveSessions();
-    print('Alle Sessions gelöscht');
-  }
-
   IconData _getCategoryIcon(String category) {
     switch (category) {
       case 'Arbeit':
@@ -586,6 +594,9 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(131, 75, 0, 64),
+      extendBody:
+          true, // Erweitert den Body hinter die Navigationsleiste
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         elevation: 2,
         shadowColor: Colors.black,
