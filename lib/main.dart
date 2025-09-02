@@ -4,8 +4,9 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'models/session_model.dart';
 import 'services/session_service.dart';
 import 'widgets/session_dialog.dart';
-import 'widgets/session_history_dialog.dart';
-import 'widgets/statistics_dialog.dart';
+import 'pages/session_history_page.dart';
+import 'pages/statistics_page.dart';
+import 'pages/settings_page.dart';
 
 void main() {
   runApp(const Hourly());
@@ -139,44 +140,56 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
     }
   }
 
-  Future<void> _deleteSession(int index) async {
-    await SessionService.deleteSession(
-      index,
-      savedSessions,
-    );
-    await _loadSessions(); // Sessions neu laden
-  }
-
   void _showSavedSessions() {
     setState(() {
       isNotification = false;
       notificationNum = 0;
     });
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SessionHistoryDialog(
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SessionHistoryPage(
           sessions: savedSessions,
           onDeleteSession: (index) async {
-            await _deleteSession(index);
-            // Dialog automatisch neu öffnen
-            if (context.mounted) {
-              Navigator.of(context).pop();
-              _showSavedSessions();
-            }
+            await SessionService.deleteSession(
+              index,
+              savedSessions,
+            );
+            await _loadSessions();
+            setState(() {});
           },
-        );
-      },
+        ),
+      ),
     );
   }
 
   void _showStatistics() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return StatisticsDialog(sessions: savedSessions);
-      },
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            StatisticsPage(sessions: savedSessions),
+      ),
+    );
+  }
+
+  void _showSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SettingsPage(
+          onDeleteAllSessions: () async {
+            savedSessions.clear();
+            await SessionService.saveSessions([]);
+            await _loadSessions();
+            setState(() {
+              isNotification = false;
+              notificationNum = 0;
+            });
+          },
+        ),
+      ),
     );
   }
 
@@ -202,11 +215,30 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
           ),
           onPressed: _showStatistics,
         ),
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+        title: Container(
+          width: 120,
+          height: 40,
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 76, 0, 78),
+            borderRadius: BorderRadius.all(
+              Radius.circular(34),
+            ),
+            border: Border.all(
+              color: Colors.white.withOpacity(
+                0.1,
+              ), // Dünner, weißer Border
+              width: 2.0, // Dünne Linie
+            ),
+          ),
+          child: Center(
+            child: Text(
+              widget.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         centerTitle: true,
@@ -222,19 +254,20 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.history,
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 0, 7, 0),
+                  child: const Icon(
+                    Icons.notifications,
                     color: Colors.white,
                     size: 24,
                   ),
-                  onPressed: _showSavedSessions,
                 ),
                 // Notification Badge
                 if (isNotification && notificationNum > 0)
                   Positioned(
-                    right: 6,
-                    top: 6,
+                    right: 0,
+                    top: 0,
+                    bottom: 6,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
@@ -295,7 +328,7 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
                 Container(
                   margin: const EdgeInsets.fromLTRB(
                     0,
-                    0,
+                    100,
                     0,
                     0,
                   ),
@@ -314,78 +347,120 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
 
                       currentTimeString = displayTime;
 
-                      return Text(
-                        displayTime,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
+                      return Container(
+                        width: 200,
+                        height: 85,
+                        margin: EdgeInsets.fromLTRB(
+                          0,
+                          0,
+                          0,
+                          0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(
+                            255,
+                            76,
+                            0,
+                            78,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(34),
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(
+                              0.1,
+                            ), // Dünner, weißer Border
+                            width: 2.0, // Dünne Linie
+                          ),
+                        ),
+
+                        child: Center(
+                          child: Text(
+                            displayTime,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
 
-                // Action Text
                 Container(
-                  margin: const EdgeInsets.fromLTRB(
-                    0,
-                    200,
-                    0,
-                    0,
-                  ),
-                  child: Text(
-                    isSessionActive
-                        ? "Session stoppen"
-                        : "Session starten",
-                    style: const TextStyle(
-                      color: Color.fromARGB(
-                        255,
-                        195,
-                        0,
-                        255,
-                      ),
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
+                  width: 350,
+                  height: 85,
+                  margin: EdgeInsets.fromLTRB(0, 250, 0, 0),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(
+                      255,
+                      76,
+                      0,
+                      78,
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(34),
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(
+                        0.1,
+                      ), // Dünner, weißer Border
+                      width: 2.0, // Dünne Linie
                     ),
                   ),
-                ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _showSettings,
+                          icon: const Icon(
+                            Icons.settings,
+                            color: Colors.white,
+                            size: 35,
+                          ),
+                        ),
+                      ),
 
-                // Action Button
-                Container(
-                  margin: const EdgeInsets.fromLTRB(
-                    0,
-                    20,
-                    0,
-                    0,
-                  ),
-                  child: Material(
-                    elevation: 4.0,
-                    shadowColor: isSessionActive
-                        ? Colors.red.withValues()
-                        : Colors.green.withValues(),
-                    shape: const CircleBorder(),
-                    color: isSessionActive
-                        ? Colors.red
-                        : Colors.green,
-                    child: InkWell(
-                      onTap: _startSession,
-                      customBorder: const CircleBorder(),
-                      child: Container(
-                        width: 56,
-                        height: 56,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          size: 30,
-                          color: Colors.white,
-                          isSessionActive
-                              ? Icons.stop
-                              : Icons.play_arrow,
+                      Expanded(
+                        child: Material(
+                          elevation: 4.0,
+                          shadowColor: isSessionActive
+                              ? Colors.red.withValues()
+                              : Colors.green.withValues(),
+                          shape: const CircleBorder(),
+                          color: isSessionActive
+                              ? Colors.red
+                              : Colors.green,
+                          child: InkWell(
+                            onTap: _startSession,
+                            customBorder:
+                                const CircleBorder(),
+
+                            child: Icon(
+                              size: 60,
+                              color: Colors.white,
+                              isSessionActive
+                                  ? Icons.stop_rounded
+                                  : Icons
+                                        .play_arrow_rounded,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _showSavedSessions,
+                          icon: const Icon(
+                            Icons.access_time,
+                            color: Colors.white,
+                            size: 35,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
