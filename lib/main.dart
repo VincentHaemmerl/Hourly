@@ -46,6 +46,59 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
   List<Map<String, String>> savedSessions = [];
   final StopWatchTimer _stopWatchTimer = StopWatchTimer();
 
+  String getAverageTime() {
+    if (savedSessions.isEmpty) return "00:00:00";
+
+    int totalSeconds = 0;
+
+    for (var session in savedSessions) {
+      String timeStr = session['time'] ?? "00:00:00";
+      List<String> parts = timeStr.split(':');
+      if (parts.length == 3) {
+        int hours = int.parse(parts[0]);
+        int minutes = int.parse(parts[1]);
+        int seconds = int.parse(parts[2]);
+        totalSeconds +=
+            hours * 3600 + minutes * 60 + seconds;
+      }
+    }
+
+    int avgSeconds = (totalSeconds / savedSessions.length)
+        .round();
+    int hours = avgSeconds ~/ 3600;
+    int minutes = (avgSeconds % 3600) ~/ 60;
+    int seconds = avgSeconds % 60;
+
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  int getAverageSeconds() {
+    if (savedSessions.isEmpty) return 1;
+
+    int totalSeconds = 0;
+
+    for (var session in savedSessions) {
+      String timeStr = session['time'] ?? "00:00:00";
+      List<String> parts = timeStr.split(':');
+      if (parts.length == 3) {
+        int hours = int.parse(parts[0]);
+        int minutes = int.parse(parts[1]);
+        int seconds = int.parse(parts[2]);
+        totalSeconds +=
+            hours * 3600 + minutes * 60 + seconds;
+      }
+    }
+
+    int averageSeconds =
+        (totalSeconds / savedSessions.length).round();
+
+    if (averageSeconds <= 0) {
+      return 0;
+    } else {
+      return averageSeconds;
+    }
+  }
+
   int getDaysSinceLastSession() {
     if (savedSessions.isEmpty) {
       return -1;
@@ -72,20 +125,102 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
 
   String getLastSessionText() {
     int days = getDaysSinceLastSession();
+    int avgSeconds = getAverageSeconds();
 
-    if (days == -1 || days >= 5) {
-      return " ZU NIEDRIG!";
-    } else if (days >= 3 && days < 5) {
-      return " niedrig";
-    } else if (days >= 1 && days < 3) {
-      return " mittelmäßig";
-    } else if (days > 0 && days < 1) {
-      return " hoch";
-    } else if (days == 0) {
+    // Berechne einen kombinierten Score
+    int productivityScore = _calculateProductivityScore(
+      days,
+      avgSeconds,
+    );
+
+    if (productivityScore >= 90) {
       return " GROSSARTIG!";
+    } else if (productivityScore >= 70) {
+      return " hoch";
+    } else if (productivityScore >= 50) {
+      return " mittelmäßig";
+    } else if (productivityScore >= 30) {
+      return " niedrig";
     } else {
-      return "Unmöglich!!!";
+      return " ZU NIEDRIG!";
     }
+  }
+
+  // Neue Funktion für kombinierten Produktivitäts-Score
+  int _calculateProductivityScore(
+    int days,
+    int avgSeconds,
+  ) {
+    // Basis-Score für Aktualität (0-50 Punkte)
+    int activityScore = 0;
+    if (days == -1) {
+      activityScore = 0; // Keine Sessions
+    } else if (days == 0) {
+      activityScore = 50; // Heute aktiv = volle Punkte
+    } else if (days == 1) {
+      activityScore = 40; // Gestern = sehr gut
+    } else if (days <= 3) {
+      activityScore = 30; // Vor 2-3 Tagen = ok
+    } else if (days <= 7) {
+      activityScore = 20; // Vor 4-7 Tagen = nicht so gut
+    } else if (days <= 14) {
+      activityScore = 10; // Vor 8-14 Tagen = schlecht
+    } else {
+      activityScore =
+          0; // Mehr als 2 Wochen = sehr schlecht
+    }
+
+    // Basis-Score für Session-Qualität (0-50 Punkte)
+    int qualityScore = 0;
+    if (avgSeconds >= 7200) {
+      // 2+ Stunden
+      qualityScore = 50;
+    } else if (avgSeconds >= 3600) {
+      // 1-2 Stunden
+      qualityScore = 45;
+    } else if (avgSeconds >= 1800) {
+      // 30-60 Minuten
+      qualityScore = 35;
+    } else if (avgSeconds >= 900) {
+      // 15-30 Minuten
+      qualityScore = 25;
+    } else if (avgSeconds >= 300) {
+      // 5-15 Minuten
+      qualityScore = 15;
+    } else if (avgSeconds >= 60) {
+      // 1-5 Minuten
+      qualityScore = 5;
+    } else {
+      qualityScore = 0; // Weniger als 1 Minute
+    }
+
+    // Bonus/Malus je nach Kombination
+    int bonusScore = 0;
+
+    // Bonus: Sehr lange Sessions können alte Daten kompensieren
+    if (avgSeconds >= 3600 && days <= 7) {
+      bonusScore +=
+          10; // Lange Sessions + nicht zu alt = Bonus
+    }
+
+    // Malus: Kurze Sessions werden strenger bewertet
+    if (avgSeconds < 600 && days > 2) {
+      bonusScore -= 10; // Kurze Sessions + alt = Malus
+    }
+
+    // Bonus: Konsistenz bei mittleren Sessions
+    if (avgSeconds >= 1200 &&
+        avgSeconds <= 2400 &&
+        days <= 3) {
+      bonusScore +=
+          5; // Mittlere Sessions regelmäßig = Bonus
+    }
+
+    int totalScore =
+        activityScore + qualityScore + bonusScore;
+
+    // Stelle sicher, dass Score zwischen 0-100 liegt
+    return totalScore.clamp(0, 100);
   }
 
   @override
@@ -551,6 +686,22 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
+                    "Durchschnittliche Session-Zeit:",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                    getAverageTime(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
                     "Deine Produktivität ist:",
                     style: TextStyle(
                       color: Colors.white,
@@ -574,8 +725,7 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
                     child: Text(
                       productivityText,
                       style: TextStyle(
-                        color:
-                            getProductivityColor(), // <- Hier die dynamische Farbe!
+                        color: getProductivityColor(),
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -585,6 +735,17 @@ class _HourlyHomePageState extends State<HourlyHomePage> {
               ),
             ),
           ),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Schließen',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
     );
