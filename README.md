@@ -11,6 +11,7 @@ Eine Flutter-App für produktives Zeitmanagement mit Session-Tracking und Produk
 - **Dynamische Farbkodierung**: Visuelles Feedback über dein Produktivitätslevel
 - **Notification-System**: Badge-Benachrichtigungen für neue Sessions
 - **Session-Historie**: Vollständige Übersicht aller gespeicherten Sessions
+- **Einstellungen**: Passe die App nach deinen Wünschen an (z. B. Benachrichtigungseinstellungen, Sprache, etc.).
 
 ## Technologien 🛠️
 
