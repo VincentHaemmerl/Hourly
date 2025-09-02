@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   stop_watch_timer: ^3.2.2
   shared_preferences: ^2.2.2
+  curved_navigation_bar: ^1.0.6
 
 dev_dependencies:
   flutter_test:
