@@ -1,36 +1,51 @@
-# Hourly 📱⏱️
+Hourly is a Flutter app for productive time management with session tracking and productivity measurement.
 
-Eine Flutter-App für produktives Zeitmanagement mit Session-Tracking und Produktivitätsmessung.
+Features ✨
 
-## Features ✨
+Session timer: Start and stop sessions with custom names
 
-- **Session-Timer**: Starte und stoppe Sessions mit benutzerdefinierten Namen
-- **Kategorien**: Organisiere Sessions in verschiedene Kategorien (Arbeit, Lernen, Sport, etc.)
-- **Persistente Speicherung**: Alle Sessions werden dauerhaft gespeichert
-- **Produktivitäts-Tracking**: Überwache deine Produktivität basierend auf den letzten Sessions
-- **Dynamische Farbkodierung**: Visuelles Feedback über dein Produktivitätslevel
-- **Notification-System**: Badge-Benachrichtigungen für neue Sessions
-- **Session-Historie**: Vollständige Übersicht aller gespeicherten Sessions
-- **Einstellungen**: Passe die App nach deinen Wünschen an (z. B. Benachrichtigungseinstellungen, Sprache, etc.).
+Categories: Organize sessions into different categories (work, study, sports, etc.)
 
-## Technologien 🛠️
+Persistent storage: All sessions are saved permanently
 
-- **Flutter** - Cross-platform mobile development
-- **Dart** - Programming language
-- **stop_watch_timer** - Präzise Timer-Funktionalität
-- **shared_preferences** - Lokale Datenspeicherung
+Productivity tracking: Monitor your productivity based on recent sessions
 
-## Installation 🚀
+Dynamic color coding: Visual feedback on your productivity level
 
-1. Flutter SDK installieren
-2. Repository klonen: `git clone https://github.com/X0Vincent0X/Hourly.git`
-3. Dependencies installieren: `flutter pub get`
-4. App starten: `flutter run`
+Notification system: Badge notifications for new sessions
 
-## Produktivitätslevel 🎯
+Session history: Complete overview of all saved sessions
 
-- 🟢 **GROSSARTIG!** - Session heute
-- 🟢 **Hoch** - 1-4 Tage seit letzter Session
-- 🟠 **Mittelmäßig** - 5-9 Tage seit letzter Session
-- 🔴 **Niedrig** - 10-14 Tage seit letzter Session
-- 🔴 **ZU NIEDRIG!** - 15+ Tage seit letzter Session
+Settings: Customize the app to your preferences (e.g., notification settings, language, etc.)
+
+Technologies 🛠️
+
+Flutter – cross-platform mobile development
+
+Dart – programming language
+
+stop_watch_timer – precise timer functionality
+
+shared_preferences – local data storage
+
+Installation 🚀
+
+Install Flutter SDK
+
+Clone the repository: git clone https://github.com/X0Vincent0X/Hourly.git
+
+Install dependencies: flutter pub get
+
+Run the app: flutter run
+
+Productivity levels 🎯
+
+🟢 GREAT! – Session today
+
+🟢 High – 1-4 days since last session
+
+🟠 Medium – 5-9 days since last session
+
+🔴 Low – 10-14 days since last session
+
+🔴 TOO LOW! – 15+ days since last session
